@@ -114,9 +114,53 @@ async function main(){
     .post("https://tecweb-js.insper-comp.com.br/exercicio/soma-valores", {'resposta': contagem,}, config2)
     .then((response) => console.log(response.data));
 
+    let n = exercises['n-esimo-primo'].entrada.n;
+    let enesimo = enesimoPrimo(n);
+    console.log(enesimo);
+    axios
+    .post("https://tecweb-js.insper-comp.com.br/exercicio/n-esimo-primo", {'resposta': enesimo}, config2)
+    .then((response) => console.log(response.data));
+
+    let arr = exercises['maior-prefixo-comum'].entrada.strings;
+    let prefixo = maiorPrefixoComum(arr);
+    console.log(prefixo);
+    axios
+    .post("https://tecweb-js.insper-comp.com.br/exercicio/maior-prefixo-comum", {'resposta': prefixo}, config2)
+    .then((response) => console.log(response.data));
+
+    let numeroS = exercises['soma-segundo-maior-e-menor-numeros'].entrada.numeros;
+    let somaS = somaSegundoMaiorMenor(numeroS);
+    console.log(somaS);
+    axios
+    .post("https://tecweb-js.insper-comp.com.br/exercicio/soma-segundo-maior-e-menor-numeros", {'resposta': somaS}, config2)
+    .then((response) => console.log(response.data));
+
+    let palindromoS = exercises['conta-palindromos'].entrada.palavras;
+    let contador = contarPalindromos(palindromoS);
+    console.log(contador);
+    axios
+    .post("https://tecweb-js.insper-comp.com.br/exercicio/conta-palindromos", {'resposta': contador}, config2)
+    .then((response) => console.log(response.data));
+
+    let array = exercises['soma-de-strings-de-ints'].entrada.strings;
+    let somaArray = somaValoresInteiros(array);
+    console.log(somaArray);
+    axios
+    .post("https://tecweb-js.insper-comp.com.br/exercicio/soma-de-strings-de-ints", {'resposta': somaArray}, config2)
+    .then((response) => console.log(response.data));
+
+    let endpoints = exercises['soma-com-requisicoes'].entrada.endpoints;
+    let somaTotal = calcularSomaEndpoints(endpoints);
+    console.log(somaTotal);
+    axios
+    .post("https://tecweb-js.insper-comp.com.br/exercicio/soma-com-requisicoes", {'resposta': somaTotal}, config2)
+    .then((response) => console.log(response.data));
+
 }
 
 main();
+
+// Funções
 
 const soma = function(a, b){
     return a + b;
@@ -174,5 +218,109 @@ const somaValores = function(objeto){
         }
     return somaTotal;
 }   
+
+const enesimoPrimo = function(n) {
+    let contador = 0;
+    let numeroAtual = 2;
+  
+    while (contador < n) {
+      if (ePrimo(numeroAtual)) {
+        contador++;
+      }
+      numeroAtual++;
+    }
+  
+    return numeroAtual - 1;
+  }
+  
+const ePrimo = function(numero) {
+    for (let i = 2; i <= Math.sqrt(numero); i++) {
+        if (numero % i === 0) {
+        return false;
+        }
+    }
+    return true;
+}
+
+const maiorPrefixoComum = function(arr) {
+    if (arr.length === 0) {
+        return '';
+    }
+
+    let prefixo = arr[0];
+    for (let i = 1; i < arr.length; i++) {
+        let str = arr[i];
+        let j = 0;
+        while (j < prefixo.length && j < str.length && prefixo[j] === str[j]) {
+        j++;
+        }
+        prefixo = prefixo.slice(0, j);
+        if (prefixo === '') {
+        break;
+        }
+    }
+
+    return prefixo;
+}
+
+const somaSegundoMaiorMenor = function(numeros) {
+    if (numeros.length < 2) {
+      return 'Array deve ter pelo menos 2 elementos';
+    }
+  
+    let sortedArray = numeros.slice().sort((a, b) => a - b);
+    let segundoMenor = sortedArray[1];
+    let segundoMaior = sortedArray[sortedArray.length - 2];
+  
+    return segundoMaior + segundoMenor;
+  }
+
+const contarPalindromos = function(Palindromos) {
+    let contador = 0;
+
+    for (let palavra of Palindromos) {
+        if (ePalindromo(palavra)) {
+        contador++;
+        }
+    }
+
+    return contador;
+}
+
+const ePalindromo = function(palavra) {
+    const tamanho = palavra.length;
+    for (let i = 0; i < tamanho / 2; i++) {
+        if (palavra[i] !== palavra[tamanho - 1 - i]) {
+        return false;
+        }
+    }
+    return true;
+}
+
+const somaValoresInteiros = function(array) {
+    const valoresInteiros = array.map(str => parseInt(str, 10));
+    const soma = valoresInteiros.reduce((acumulador, valorAtual) => acumulador + valorAtual, 0);
+    return soma;
+  }
+
+const calcularSomaEndpoints = async function(endpoints) {
+    let somaTotal = 0;
+  
+    for (let endpoint of endpoints) {
+      try {
+        const response = await fetch(endpoint);
+        if (!response.ok) {
+          throw new Error(`Erro ao acessar o endpoint ${endpoint}`);
+        }
+        const numero = await response.json();
+        somaTotal += numero;
+      } catch (error) {
+        console.error(error.message);
+      }
+    }
+  
+    return somaTotal;
+}
+
 
 
