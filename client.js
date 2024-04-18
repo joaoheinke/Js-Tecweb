@@ -149,11 +149,37 @@ async function main(){
     .post("https://tecweb-js.insper-comp.com.br/exercicio/soma-de-strings-de-ints", {'resposta': somaArray}, config2)
     .then((response) => console.log(response.data));
 
-    let endpoints = exercises['soma-com-requisicoes'].entrada.endpoints;
-    let somaTotal = calcularSomaEndpoints(endpoints);
-    console.log(somaTotal);
+    async function somaRequisicoes(endpoints) {
+        let lista = [];
+        for (let endpoint in endpoints) {
+            let url = await axios.get(endpoints[endpoint],config2);
+            lista.push(url.data);
+        }
+        let soma = lista.reduce((acumulador, valorAtual) => acumulador + valorAtual, 0);
+        return soma;
+    }
+
+    let endpoint = exercises['soma-com-requisicoes'].entrada.endpoints;
+    let somaReq = await somaRequisicoes(endpoint);
+    console.log(somaReq);
     axios
-    .post("https://tecweb-js.insper-comp.com.br/exercicio/soma-com-requisicoes", {'resposta': somaTotal}, config2)
+    .post("https://tecweb-js.insper-comp.com.br/exercicio/soma-com-requisicoes", {'resposta': somaReq}, config2)
+    .then((response) => console.log(response.data));
+
+    async function cacaAoTesouro(url) {
+        while(typeof url !== 'number') {
+            console.log(url);
+            url = await axios.get(url, config2);
+            
+        }
+        return url;
+    }
+
+    let url = exercises['caca-ao-tesouro'].entrada.inicio;
+    let tesouro = await cacaAoTesouro(url);
+    console.log(tesouro);
+    axios
+    .post("https://tecweb-js.insper-comp.com.br/exercicio/caca-ao-tesouro", {'resposta': tesouro}, config2)
     .then((response) => console.log(response.data));
 
 }
@@ -243,24 +269,36 @@ const ePrimo = function(numero) {
 }
 
 const maiorPrefixoComum = function(arr) {
-    if (arr.length === 0) {
+    if (arr.length < 2){
         return '';
     }
+    arr.sort();
 
-    let prefixo = arr[0];
-    for (let i = 1; i < arr.length; i++) {
-        let str = arr[i];
-        let j = 0;
-        while (j < prefixo.length && j < str.length && prefixo[j] === str[j]) {
-        j++;
+    let maior = '';
+
+    for (let i = 0; i < arr.length-1; i++) {
+        let pAtual = preComum(arr[i], arr[i+1]);
+        if (pAtual.length > maior.length) {
+            maior = pAtual;
         }
-        prefixo = prefixo.slice(0, j);
-        if (prefixo === '') {
-        break;
+        
+    }
+    return maior;
+
+}
+
+const preComum = function(str1, str2) {
+    let prefixo = '';
+    let tamanho = Math.min(str1.length, str2.length);
+    for (let i = 0; i < tamanho; i++) {
+        if (str1[i] === str2[i]) {
+            prefixo += str1[i];
+        } else {
+            break;
         }
     }
-
     return prefixo;
+
 }
 
 const somaSegundoMaiorMenor = function(numeros) {
@@ -303,24 +341,9 @@ const somaValoresInteiros = function(array) {
     return soma;
   }
 
-const calcularSomaEndpoints = async function(endpoints) {
-    let somaTotal = 0;
-  
-    for (let endpoint of endpoints) {
-      try {
-        const response = await fetch(endpoint);
-        if (!response.ok) {
-          throw new Error(`Erro ao acessar o endpoint ${endpoint}`);
-        }
-        const numero = await response.json();
-        somaTotal += numero;
-      } catch (error) {
-        console.error(error.message);
-      }
-    }
-  
-    return somaTotal;
-}
+
+
+
 
 
 
