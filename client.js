@@ -169,7 +169,9 @@ async function main(){
     async function cacaAoTesouro(url) {
         while(typeof url !== 'number') {
             console.log(url);
-            url = await axios.get(url, config2);
+            url = await axios
+            .get(url, config2)
+            .then((response) => response.data);
             
         }
         return url;
